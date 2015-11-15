@@ -6,7 +6,10 @@ var check = require('../src/check');
 
 check.init();
 
-var person = { name: 'John', age: 20 };
+var person = {
+    name: 'John',
+    age: 20
+};
 var numbers = [1, 2, 3];
 var func = function (a, b) {};
 var str = 'some string';
