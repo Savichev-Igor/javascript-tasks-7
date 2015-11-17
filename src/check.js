@@ -102,8 +102,8 @@ function checkContainsValues(values) {
 function checkHasValues(values) {
     var objValues = [];
 
-    /* Почему-то для массива верны оба оператора - и 'this instanceof Object' и
-     'this instanceof Array'  :/ */
+    /* Почему-то для массива верны оба оператора - и 'this instanceof Object'
+       и 'this instanceof Array'  :/ */
     if (this instanceof Array) {
         objValues = this.slice();
     } else {
