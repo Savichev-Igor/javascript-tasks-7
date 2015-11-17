@@ -210,13 +210,13 @@ exports.init = function () {
     [Object.prototype].forEach(function (item) {
         smartDefineProperty(item, 'checkHasValueType', checkHasValueType);
     });
-    [Array.prototype, String.prototype].forEach(function (item){
+    [Array.prototype, String.prototype].forEach(function (item) {
         smartDefineProperty(item, 'checkHasLength', checkHasLength);
     });
     [Function.prototype].forEach(function (item) {
         smartDefineProperty(item, 'checkHasParamsCount', checkHasParamsCount);
     });
-    [String.prototype].forEach(function (item){
+    [String.prototype].forEach(function (item) {
         smartDefineProperty(item, 'checkHasWordsCount', checkHasWordsCount);
     });
 };
