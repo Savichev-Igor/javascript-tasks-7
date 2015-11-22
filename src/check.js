@@ -17,11 +17,10 @@ function smartDefineProperty(itemPrototype, methodName, func) {
 /**
  * @author Savi
  *
- * Метод определён для объектов и массивов. Проверяет, что цель содержит указанные ключи.
- * @param {array} keys
- * @return {boolean|undefined}
+ * Метод определён для объектов и массивов. Собирает все ключи.
+ * @return {array} objKeys
  */
-function checkContainsKeys(keys) {
+function checkKeys() {
     var objKeys = [];
 
     if ((this instanceof Array) || (this instanceof Object)) {
@@ -30,6 +29,20 @@ function checkContainsKeys(keys) {
             objKeys.push(key);
         }
     }
+
+    return objKeys;
+}
+
+/**
+ * @author Savi
+ *
+ * Метод определён для объектов и массивов. Проверяет, что цель содержит указанные ключи.
+ * @param {array} keys
+ * @return {boolean|undefined}
+ */
+function checkContainsKeys(keys) {
+    var objKeys = checkKeys.call(this);
+
     if (objKeys.length === 0) {
         return;
     }
@@ -47,14 +60,8 @@ function checkContainsKeys(keys) {
  * @return {boolean|undefined}
  */
 function checkHasKeys(keys) {
-    var objKeys = [];
+    var objKeys = checkKeys.call(this);
 
-    if ((this instanceof Array) || (this instanceof Object)) {
-        // Если объект, то мы ещё возьмём и ключи прототипов :3
-        for (var key in this) {
-            objKeys.push(key);
-        }
-    }
     if (objKeys.length === 0) {
         return;
     }
@@ -65,15 +72,14 @@ function checkHasKeys(keys) {
 /**
  * @author Savi
  *
- * Метод определён для объектов и массивов. Проверяет, что цель содержит указанные значения.
- * @param {array} values
- * @return {boolean|undefined}
+ * Метод определён для объектов и массивов. Собирает все значения.
+ * @return {array} objValues
  */
-function checkContainsValues(values) {
+function checkValues() {
     var objValues = [];
 
-    /* Почему-то для массива верны оба оператора - и 'this instanceof Object' и
-       'this instanceof Array'  :/ */
+    /* Почему-то для массива верны оба оператора - и 'this instanceof Object'
+     и 'this instanceof Array'  :/ */
     if (this instanceof Array) {
         objValues = this.slice();
     } else {
@@ -83,6 +89,19 @@ function checkContainsValues(values) {
             }
         }
     }
+
+    return objValues;
+}
+/**
+ * @author Savi
+ *
+ * Метод определён для объектов и массивов. Проверяет, что цель содержит указанные значения.
+ * @param {array} values
+ * @return {boolean|undefined}
+ */
+function checkContainsValues(values) {
+    var objValues = checkValues.call(this);
+
     if (objValues.length === 0) {
         return;
     }
@@ -100,19 +119,8 @@ function checkContainsValues(values) {
  * @return {boolean|undefined}
  */
 function checkHasValues(values) {
-    var objValues = [];
+    var objValues = checkValues.call(this);
 
-    /* Почему-то для массива верны оба оператора - и 'this instanceof Object'
-       и 'this instanceof Array'  :/ */
-    if (this instanceof Array) {
-        objValues = this.slice();
-    } else {
-        if (this instanceof Object) {
-            for (var key in this) {
-                objValues.push(this[key]);
-            }
-        }
-    }
     if (objValues.length === 0) {
         return;
     }
@@ -136,6 +144,14 @@ function checkHasValueType(key, type) {
         }
     } else {
         return;
+    }
+
+    if (type === Function) {
+        return this[key] instanceof Function;
+    }
+
+    if (type === Array) {
+        return this[key] instanceof Array;
     }
 
     // Просто проинициализируем ещё раз конструктором и сравним без приведения типов
@@ -195,28 +211,14 @@ function checkHasWordsCount(count) {
 exports.init = function () {
     /* Мне кажется, что указание 'Array.prototype' излишне, т.к. всё равно в поиске этого метода он
        дойдет до 'Object.prototype', тем более некоторые методы эквивалентны */
-    [Object.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkContainsKeys', checkContainsKeys);
-    });
-    [Object.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkHasKeys', checkHasKeys);
-    });
-    [Object.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkContainsValues', checkContainsValues);
-    });
-    [Object.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkHasValues', checkHasValues);
-    });
-    [Object.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkHasValueType', checkHasValueType);
-    });
+    smartDefineProperty(Object.prototype, 'checkContainsKeys', checkContainsKeys);
+    smartDefineProperty(Object.prototype, 'checkHasKeys', checkHasKeys);
+    smartDefineProperty(Object.prototype, 'checkContainsValues', checkContainsValues);
+    smartDefineProperty(Object.prototype, 'checkHasValues', checkHasValues);
+    smartDefineProperty(Object.prototype, 'checkHasValueType', checkHasValueType);
     [Array.prototype, String.prototype].forEach(function (item) {
         smartDefineProperty(item, 'checkHasLength', checkHasLength);
     });
-    [Function.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkHasParamsCount', checkHasParamsCount);
-    });
-    [String.prototype].forEach(function (item) {
-        smartDefineProperty(item, 'checkHasWordsCount', checkHasWordsCount);
-    });
+    smartDefineProperty(Function.prototype, 'checkHasParamsCount', checkHasParamsCount);
+    smartDefineProperty(String.prototype, 'checkHasWordsCount', checkHasWordsCount);
 };
